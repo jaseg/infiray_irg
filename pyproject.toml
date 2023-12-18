@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "infiray_irg"
+version = "1.0.0"
+authors = [
+  { name="jaseg", email="code@jaseg.de" },
+]
+description = "A simple parser for Infiray IRG radiometric thermal imaging files"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://jaseg.de/project/infiray_irg"
+Issues = "https://github.com/jaseg/infiray_irg/issues"
