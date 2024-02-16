@@ -8,11 +8,14 @@ def load(data):
         nonlocal data
         out, data = data[:n], data[n:]
         if len(out) < n:
-            raise ValueError('file is truncated')
+            raise ValueError(f'File is truncated, tried to read {n} bytes, but only {len(out)} bytes remain.')
         return out
         
     header = consume(128)
-    if header[:2] != bytes([0xca, 0xac]) or header[-2:] != bytes([0xac, 0xca]):
+    if header[:2] not in [
+            bytes([0xca, 0xac]),
+            bytes([0xba, 0xab])
+            ] or header[-2:] != bytes([0xac, 0xca]):
         raise ValueError('Header magic not found.')
 
     _unk0, coarse_section_length, y_res, x_res,\
@@ -28,9 +31,19 @@ def load(data):
         raise ValueError('Resolution mismatch in header')
         
     coarse_img = np.frombuffer(consume(coarse_section_length), dtype=np.uint8).reshape((y_res, x_res))
-    fine_img = np.frombuffer(consume(x_res*y_res*2), dtype=np.int16).reshape((y_res, x_res))
-    fine_img = (fine_img / 16) - 273
-    vis_jpg = Image.open(io.BytesIO(consume(jpeg_length)))
+    if header[:2] == bytes([0xca, 0xac]):
+        # 1/16th Kelvin steps
+        fine_img = np.frombuffer(consume(x_res*y_res*2), dtype=np.uint16).reshape((y_res, x_res))
+        fine_img = (fine_img / 16) - 273
+
+        vis_jpg = Image.open(io.BytesIO(consume(jpeg_length)))
+
+    else: # 0xbaac variant
+        # 0.1 Kelvin steps
+        fine_img = np.frombuffer(consume(x_res*y_res*2), dtype=np.uint16).reshape((y_res, x_res))
+        fine_img = fine_img / 10 - 273
+
+        vis_jpg = Image.open(io.BytesIO(data))
     
     return coarse_img, fine_img, vis_jpg
 
