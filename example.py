@@ -3,7 +3,7 @@ from pathlib import Path
 
 import infiray_irg
 
-coarse, fine, vis = infiray_irg.load(Path('example-2.irg').read_bytes())
+coarse, fine, vis = infiray_irg.load(Path('example.irg').read_bytes())
 
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 18))
 
