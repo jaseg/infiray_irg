@@ -1,9 +1,9 @@
 # Infiray IRG file format parser
 
-This python module contains a simple parser for the "IRG" file format that the Infiray C200 series thermal cameras use
-to dump their raw data. The files contain three things: A thermal image with 8 bit resolution with contrast scaled to
-fit the 0...255 range, a thermal image with 16 bit resolution containing absolute temperature values with 1/16 K
-resolution, and a JPEG with the image from the low-res visual camera.
+This python module contains a simple parser for the "IRG" file format that the Infiray C200 series thermal cameras, P200
+series and others use to dump their raw data. The files contain three things: A thermal image with 8 bit resolution with
+contrast scaled to fit the 0...255 range, a thermal image with 16 bit resolution containing absolute temperature values
+with 1/16 K resolution, and for some models a JPEG with the image from the low-res visual camera.
 
 ## Requirements
 
@@ -50,7 +50,9 @@ print('Coldest pixel:', fine.min(), 'C', 'Hottest pixel:', fine.max(), 'C')
 
 ## Bugs
 
-If you find a bug, or find a file that this library can't load, please send me an email at <code@jaseg.de>.
+If you find a bug, or find a file that this library can't load, please send me an email at <code@jaseg.de>. If your
+thermal camera isn't supported, please send me an email with one or more example pictures. Please make sure there's
+something of high contrast visible on these pictures, such as a hot cup of tea.
 
 ## License
 
