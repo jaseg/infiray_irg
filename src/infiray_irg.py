@@ -1,4 +1,5 @@
 from PIL import Image
+import warnings
 import numpy as np
 import struct
 import io
@@ -26,14 +27,19 @@ def load(data):
     _zero0, _unk1, _zero1, fine_offset, _unk2, jpeg_length,\
     y_res_2, x_res_2, _unk3, = struct.unpack('<HIHHHHHHHIHHI', header[2:34])
 
-    _zero_celsius0, _zero_celsius1, *rest, high_gain_mode_flag = struct.unpack('<11I', header[34:78])
+    fine_temp_offset1, fine_temp_offset2, *rest, high_gain_mode_flag = struct.unpack('<11I', header[34:78])
     
-    import textwrap
-    print(textwrap.dedent(f'''
-        {_unk0=}, {coarse_section_length=}, {y_res=}, {x_res=},
-        {_zero0=}, {_unk1=}, {_zero1=}, {fine_offset=}, {_unk2=}, {jpeg_length=},
-        {y_res_2=}, {x_res_2=}, {_unk3=}
-        {_zero_celsius0=} {_zero_celsius1=} {rest=}, {high_gain_mode_flag=}'''))
+    if fine_temp_offset1 != fine_temp_offset2:
+        warnings.warn(f'File lists two different zero offsets for the fine image data {fine_temp_offset1} and {fine_temp_offset2}. Resulting radiometric data might be offset. Please report this with an example file to code@jaseg.de.')
+
+    fine_temp_offset = fine_temp_offset1 / 10000
+
+#    import textwrap
+#    print(textwrap.dedent(f'''
+#        {_unk0=}, {coarse_section_length=}, {y_res=}, {x_res=},
+#        {_zero0=}, {_unk1=}, {_zero1=}, {fine_offset=}, {_unk2=}, {jpeg_length=},
+#        {y_res_2=}, {x_res_2=}, {_unk3=}
+#        {fine_temp_offset1=} {fine_temp_offset1=} {rest=}, {high_gain_mode_flag=}'''))
 
     if (x_res, y_res) != (x_res_2, y_res_2) and model != 'p200':
         raise ValueError(f'Resolution mismatch in header: {x_res}*{y_res} != {x_res_2}*{y_res_2}')
@@ -47,7 +53,7 @@ def load(data):
         coarse_img = np.frombuffer(consume(coarse_section_length), dtype=np.uint8).reshape((y_res, x_res))
         # 1/16th Kelvin steps
         fine_img = np.frombuffer(consume(x_res*y_res*2), dtype=np.uint16).reshape((y_res, x_res))
-        fine_img = (fine_img / 16) - 273
+        fine_img = (fine_img / 16) - fine_temp_offset
 
         vis_jpg = Image.open(io.BytesIO(consume(jpeg_length)))
 
@@ -57,7 +63,7 @@ def load(data):
         coarse_img = np.frombuffer(consume(coarse_section_length), dtype=np.uint8).reshape((y_res, x_res))
         # 0.1 Kelvin steps
         fine_img = np.frombuffer(consume(x_res*y_res*2), dtype=np.uint16).reshape((y_res, x_res))
-        fine_img = fine_img / 10 - 273
+        fine_img = fine_img / 10 - fine_temp_offset
 
         vis_jpg = Image.open(io.BytesIO(data))
 
@@ -65,7 +71,7 @@ def load(data):
         header += consume(128)
         coarse_img = np.frombuffer(consume(coarse_section_length), dtype=np.uint8).reshape((y_res, x_res))
         fine_img = np.frombuffer(consume(x_res*y_res*2), dtype=np.uint16).reshape((y_res, x_res))
-        fine_img = fine_img / 10 - 273
+        fine_img = fine_img / 10 - fine_temp_offset
 
         # In my example file, data now contains the JSON '{"roi":[]}' and no JPG. We ignore that.
         vis_jpg = None
