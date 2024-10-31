@@ -4,6 +4,8 @@ import numpy as np
 import struct
 import io
 
+__version__ = "1.3.0"
+
 def load(data):
     def consume(n):
         nonlocal data
