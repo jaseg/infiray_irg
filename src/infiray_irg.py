@@ -4,7 +4,7 @@ import numpy as np
 import struct
 import io
 
-__version__ = "1.4.0"
+__version__ = "1.5.0"
 
 def load(data, print_debug_information=False):
     def consume(n):
