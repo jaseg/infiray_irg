@@ -45,7 +45,7 @@ def load(data, print_debug_information=False):
     # file.
     fine_temp_offset1, fine_temp_offset2, distance, *rest, unit_flag, high_gain_mode_flag = struct.unpack('<9IHHI', header[34:78])
     distance /= 1e4
-    
+
     if fine_temp_offset1 != fine_temp_offset2:
         warnings.warn(f'File lists two different zero offsets for the fine image data {fine_temp_offset1} and {fine_temp_offset2}. Resulting radiometric data might be offset. Please report this with an example file to code@jaseg.de.')
 
@@ -60,7 +60,7 @@ def load(data, print_debug_information=False):
 
     if x_res*y_res != coarse_section_length:
         raise ValueError('Resolution mismatch in header')
-        
+
     vis_jpg = None
     coarse_img = np.frombuffer(consume(coarse_section_length), dtype=np.uint8).reshape((y_res, x_res))
     fine_img = np.frombuffer(consume(x_res*y_res*2), dtype=np.uint16).reshape((y_res, x_res))
@@ -96,6 +96,5 @@ def load(data, print_debug_information=False):
         fine_img = fine_img / 10 - 273.2
 
         # In my example file, data now contains the JSON '{"roi":[]}' and no JPG. We ignore that.
-    
-    return coarse_img, fine_img, vis_jpg
 
+    return coarse_img, fine_img, vis_jpg
