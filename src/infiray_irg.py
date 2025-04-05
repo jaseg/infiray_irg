@@ -30,6 +30,7 @@ def load(data, print_debug_information=False):
             'c201': bytes([0xca, 0xac]),
             'other': bytes([0xba, 0xab]),
             'p200': bytes([0x04, 0xa0]),
+            'tc004-tr256e' : bytes([0xb0, 0x0b]),
             }.items():
         if (header[:2] + header[-2:]).startswith(match):
             break
@@ -91,7 +92,8 @@ def load(data, print_debug_information=False):
         fine_img = fine_img / 10 - 273.15
 
         vis_jpg = Image.open(io.BytesIO(data))
-
+    elif model == 'tc004-tr256e':
+        fine_img = fine_img / 10 - 273.1
     else:
         fine_img = fine_img / 10 - 273.2
 
