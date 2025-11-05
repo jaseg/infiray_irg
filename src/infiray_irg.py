@@ -69,8 +69,9 @@ def load(data, print_debug_information=False):
         if header[-2:] != bytes([0xac,0xca]):
             raise ValueError(f'Header end marker not found. Got header: {header[-2]:02x} {header[-1]:02x}')
 
-        if flag0 == 1: # Seen in Autel Robotics Evo II Dual 640T V3 file
-            fine_img = (fine_img / 64) - 25.0
+        if flag0 == 1: # Seen in Autel Robotics Evo II Dual 640T V3 file.
+            # I now have two files from different drones of this manufacturer.
+            fine_img = (fine_img / 10) - 273.15
 
         else: # C201 files
             # 1/16th Kelvin steps
