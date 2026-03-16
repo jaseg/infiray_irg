@@ -14,8 +14,9 @@ fine_plt = ax2.imshow(fine)
 ax2.set_title('Fine absolute temperatures')
 fig.colorbar(fine_plt, ax=ax2, location='right', label='degrees Celsius')
 
-ax3.imshow(vis)
-ax3.set_title('Visual')
+if vis:
+    ax3.imshow(vis)
+    ax3.set_title('Visual')
 
 ax4.hist(fine.flatten(), bins=100)
 ax4.set_title('Temperature histogram')
